@@ -45,6 +45,10 @@ jobs:
       - name: Baixar e Configurar ChromeDriver
         run: |
           CHROMEDRIVER_VERSION=$(curl -sS https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${{ env.CHROME_VERSION }})
+          if [[ $? -ne 0 || -z "$CHROMEDRIVER_VERSION" ]]; then
+            echo "Erro ao buscar a versão do ChromeDriver. Tentando usar a versão principal."
+            CHROMEDRIVER_VERSION=$(curl -sS https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$(echo ${{ env.CHROME_VERSION }} | cut -d '.' -f 1))
+          fi
           echo "Versão do ChromeDriver compatível: $CHROMEDRIVER_VERSION"
           wget https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip
           unzip chromedriver_linux64.zip
