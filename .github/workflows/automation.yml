@@ -32,18 +32,19 @@ jobs:
         run: |
           wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
           sudo apt install ./google-chrome-stable_current_amd64.deb -y
+          google-chrome --version || echo "Erro ao instalar o Google Chrome"
 
       # Passo 5: Verificar versão do Chrome
       - name: Verificar versão do Chrome
         run: |
-          CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+')
+          CHROME_VERSION=$(google-chrome --version | awk '{print $3}')
           echo "Versão do Chrome detectada: $CHROME_VERSION"
           echo "CHROME_VERSION=$CHROME_VERSION" >> $GITHUB_ENV
 
       # Passo 6: Baixar e Configurar ChromeDriver
       - name: Baixar e Configurar ChromeDriver
         run: |
-          CHROMEDRIVER_VERSION=$(curl -sS https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$(echo ${{ env.CHROME_VERSION }} | cut -d '.' -f 1))
+          CHROMEDRIVER_VERSION=$(curl -sS https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${{ env.CHROME_VERSION }})
           echo "Versão do ChromeDriver compatível: $CHROMEDRIVER_VERSION"
           wget https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip
           unzip chromedriver_linux64.zip
