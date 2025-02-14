@@ -27,19 +27,19 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # Passo 4: Verificar a versão do Chrome
-      - name: Verificar versão do Chrome
+      # Passo 4: Baixar e Configurar Chrome
+      - name: Baixar e Configurar Chrome
         run: |
-          CHROME_VERSION=$(google-chrome --version | awk '{print $3}')
-          echo "Versão do Chrome detectada: $CHROME_VERSION"
-          echo "CHROME_VERSION=$CHROME_VERSION" >> $GITHUB_ENV
-
-      # Passo 5: Baixar ChromeDriver
-      - name: Baixar ChromeDriver
-        run: |
-          CHROMEDRIVER_VERSION=$(echo ${{ env.CHROME_VERSION }} | cut -d '.' -f 1-3)
-          echo "Versão do ChromeDriver a ser baixada: $CHROMEDRIVER_VERSION"
           wget https://storage.googleapis.com/chrome-for-testing-public/133.0.6943.98/linux64/chrome-linux64.zip
+          unzip chrome-linux64.zip
+          sudo mv chrome-linux64/chrome /usr/local/bin/chrome
+          sudo chmod +x /usr/local/bin/chrome
+
+      # Passo 5: Baixar e Configurar ChromeDriver
+      - name: Baixar e Configurar ChromeDriver
+        run: |
+          CHROMEDRIVER_VERSION=133.0.6943.98  # Versão compatível com o Chrome
+          wget https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip
           unzip chromedriver_linux64.zip
           sudo mv chromedriver /usr/local/bin/chromedriver
           sudo chmod +x /usr/local/bin/chromedriver
