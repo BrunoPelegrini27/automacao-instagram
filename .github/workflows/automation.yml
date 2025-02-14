@@ -27,27 +27,34 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Verificar versão do Chrome
-  run: |
-    CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+')
-    echo "Versão do Chrome detectada: $CHROME_VERSION"
-    echo "CHROME_VERSION=$CHROME_VERSION" >> $GITHUB_ENV
+      # Passo 4: Instalar Google Chrome
+      - name: Instalar Google Chrome
+        run: |
+          wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+          sudo apt install ./google-chrome-stable_current_amd64.deb -y
 
-     - name: Baixar e Configurar ChromeDriver
-  run: |
-    CHROMEDRIVER_VERSION=$(curl -sS https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$(echo ${{ env.CHROME_VERSION }} | cut -d '.' -f 1))
-    echo "Versão do ChromeDriver compatível: $CHROMEDRIVER_VERSION"
-    wget https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip
-    unzip chromedriver_linux64.zip
-    sudo mv chromedriver /usr/local/bin/chromedriver
-    sudo chmod +x /usr/local/bin/chromedriver
-  
-      # Passo 6: Executar o script
+      # Passo 5: Verificar versão do Chrome
+      - name: Verificar versão do Chrome
+        run: |
+          CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+')
+          echo "Versão do Chrome detectada: $CHROME_VERSION"
+          echo "CHROME_VERSION=$CHROME_VERSION" >> $GITHUB_ENV
+
+      # Passo 6: Baixar e Configurar ChromeDriver
+      - name: Baixar e Configurar ChromeDriver
+        run: |
+          CHROMEDRIVER_VERSION=$(curl -sS https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$(echo ${{ env.CHROME_VERSION }} | cut -d '.' -f 1))
+          echo "Versão do ChromeDriver compatível: $CHROMEDRIVER_VERSION"
+          wget https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip
+          unzip chromedriver_linux64.zip
+          sudo mv chromedriver /usr/local/bin/chromedriver
+          sudo chmod +x /usr/local/bin/chromedriver
+
+      # Passo 7: Executar o script
       - name: Executar script de automação
         env:
           INSTAGRAM_USERNAME: ${{ secrets.INSTAGRAM_USERNAME }}
           INSTAGRAM_PASSWORD: ${{ secrets.INSTAGRAM_PASSWORD }}
         run: |
-          export INSTAGRAM_USERNAME=$INSTAGRAM_USERNAME
-          export INSTAGRAM_PASSWORD=$INSTAGRAM_PASSWORD
           python app.py
+
